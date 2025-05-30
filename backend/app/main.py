@@ -5,13 +5,27 @@ import json
 import time
 from typing import Any, Dict, Optional
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import APIRouter, FastAPI, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
 app = FastAPI()
 
+# Allow requests from the mobile app during development
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:19006", "http://localhost:8081"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+api_router = APIRouter(prefix="/api/v1")
+
 USERS: Dict[str, Dict[str, Any]] = {}
 CALENDARS: Dict[str, Dict[str, Any]] = {}
+
+auth_router = APIRouter(prefix="/auth")
 
 SECRET_KEY = "secret"
 ACCESS_TOKEN_EXPIRE_SECONDS = 3600
@@ -71,7 +85,7 @@ def decode_token(token: str) -> Dict[str, Any]:
         raise ValueError("expired")
     return payload
 
-@app.get('/healthz')
+@api_router.get('/healthz')
 async def healthz():
     return {'status': 'ok'}
 
@@ -91,7 +105,7 @@ async def inject_user(request: Request, call_next):
     return response
 
 
-@app.post('/auth/register')
+@auth_router.post('/register')
 async def register(user: UserSchema):
     if user.email in USERS:
         raise HTTPException(status_code=400, detail='User already exists')
@@ -103,7 +117,7 @@ async def register(user: UserSchema):
     return {'email': user.email}
 
 
-@app.post('/auth/login', response_model=TokenSchema)
+@auth_router.post('/login', response_model=TokenSchema)
 async def login(user: UserSchema):
     stored = USERS.get(user.email)
     if not stored or not verify_password(user.password, stored['password']):
@@ -113,10 +127,19 @@ async def login(user: UserSchema):
     return {'access_token': access, 'refresh_token': refresh, 'token_type': 'bearer'}
 
 
-@app.post('/auth/google/callback')
+@auth_router.post('/google/callback')
 async def google_callback(data: OAuthCodeSchema, request: Request):
     user = request.state.user
     if not user:
         raise HTTPException(status_code=401, detail='Not authenticated')
     CALENDARS[user['email']] = {'token': data.code}
     return {'status': 'stored'}
+
+
+api_router.include_router(auth_router)
+app.include_router(api_router)
+
+
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(request: Request, exc: Exception):
+    return JSONResponse(status_code=500, content={"detail": str(exc)})
