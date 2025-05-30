@@ -1,0 +1,9 @@
+{
+  "name": "taskmuse-mobile",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "expo-speech": "^10.1.0",
+    "react-native-voice": "^1.1.10"
+  }
+}
