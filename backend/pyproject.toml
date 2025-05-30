@@ -9,6 +9,8 @@ python = "^3.11"
 fastapi = "^0.110"
 uvicorn = {extras = ["standard"], version = "^0.28"}
 psycopg2-binary = "^2.9"
+celery = "^5.3"
+requests = "^2.31"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0"
