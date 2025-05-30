@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet } from 'react-native';
+import { useTheme } from '../ui';
 import Calendar from 'react-native-big-calendar';
 import { getTasks, getEvents, Task, CalendarEvent } from '../api/apiClient';
 
@@ -24,6 +25,7 @@ const priorityColor = (priority: Task['priority']): string => {
 export default function Home() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [events, setEvents] = useState<CombinedEvent[]>([]);
+  const { colors } = useTheme();
 
   useEffect(() => {
     async function loadData() {
@@ -52,14 +54,14 @@ export default function Home() {
   }, []);
 
   const renderTask = ({ item }: { item: Task }) => (
-    <View style={styles.taskItem}>
+    <View style={[styles.taskItem, { borderColor: colors.card }]}>
       <Text style={[styles.taskTitle, { color: priorityColor(item.priority) }]}>{item.title}</Text>
-      <Text style={styles.date}>{new Date(item.dueDate).toLocaleDateString()}</Text>
+      <Text style={[styles.date, { color: colors.text }]}>{new Date(item.dueDate).toLocaleDateString()}</Text>
     </View>
   );
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
       <Calendar events={events} height={400} />
       <FlatList
         data={tasks}
@@ -74,7 +76,6 @@ const styles = StyleSheet.create({
   taskItem: {
     padding: 8,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderColor: '#ccc',
   },
   taskTitle: {
     fontSize: 16,
@@ -82,6 +83,5 @@ const styles = StyleSheet.create({
   },
   date: {
     fontSize: 12,
-    color: '#555',
   },
 });
