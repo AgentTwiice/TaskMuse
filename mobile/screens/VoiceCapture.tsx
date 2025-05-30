@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Button, Text } from 'react-native';
 import * as Speech from 'expo-speech';
-import Voice, { SpeechResultsEvent } from '@react-native-voice/voice';
+import Voice, { SpeechResultsEvent } from 'react-native-voice';
 
 export default function VoiceCapture() {
   const [recording, setRecording] = useState(false);
