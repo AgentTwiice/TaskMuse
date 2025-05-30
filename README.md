@@ -13,5 +13,6 @@ Monorepo for the TaskMuse project. It contains the backend API and the React Nat
 └── .env.example
 ```
 
-The backend exposes a `/healthz` endpoint for health checks.
+The backend exposes a `/healthz` endpoint for health checks and simple
+authentication routes under `/auth`.
 
