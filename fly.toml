@@ -1,0 +1,8 @@
+app = "taskmuse"
+primary_region = "iad"
+
+[build]
+  image = "ghcr.io/<owner>/<repo>-backend:latest"
+
+[env]
+  PORT = "8000"
