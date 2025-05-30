@@ -1,0 +1,25 @@
+name: Mobile Build
+
+on:
+  push:
+    paths:
+      - 'mobile/**'
+      - '.github/workflows/mobile.yml'
+  workflow_dispatch:
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: Install dependencies
+        run: |
+          cd mobile
+          npm install
+      - name: Build Android APK
+        run: |
+          cd mobile
+          npx expo build:android --type apk --non-interactive
